@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.mapper.RuleMapper">
+
+	<!-- 
+		Mybatis SqlSessionFactoryBean 에서는 Mybatis 설정 기능을 활용할수 있도록 설정 파일을 	읽어오는 부분(mybatis-config.xml)과 
+		SQL 문을 작성해둘 mapper.xml 로 구성 , 보통 테이블 1개당 mapper.xml 을 작성
+		mybatis-config.xml의 typeAlias에 등록해두지 않았다면 
+		
+		<select id="selectMember" resultType="com.example.dto.MemberVO" >
+			SELECT ID, PW ,NAME FROM TEST
+		</select>
+		
+		이렇게 해야 한다.
+		
+		여기서 id는 DAO에서 사용하기 위함, resultType은 쿼리 실행 후 데이터를 memberVO에 담아서 전달
+		
+		아래 쿼리는 id="selectDomain"를 이용하여 dto 객체에 담는데 resultMap 형태로 담아오겠다는 뜻이고
+		그 아이디를 보면 type은 DomainRuleVO 클래스에 담는데 여기서 attribute는 ruleID 와 증상 배열을 가지고 온다.
+		여기서 증상배열은 select="selectSymptoms" 쿼리를 이용해서 가져오는데 같은 ruleID를 가져오면서 오름차순으로 정렬해서 가져온다.
+	-->
+	<resultMap id="domainResult" type="DomainRuleVO">
+		<result property="ruleID" column="ruleID"/>
+		<collection property="symptoms" column="ruleID" javaType="java.util.ArrayList" ofType="SymptomVO" select="selectRuleSymptoms"/>
+		<collection property="medicines" column="ruleID" javaType="java.util.ArrayList" ofType="MedicineVO" select="selectMedicines"/>
+	</resultMap>
+	
+	<select id="selectDomain" resultMap="domainResult">
+		SELECT DISTINCT ruleID FROM rule
+	</select>
+	
+	<select id="selectRuleSymptoms" resultType="SymptomVO">
+		SELECT ruleID, symptom, flag
+		FROM rule
+		WHERE ruleID = #{ruleID} ORDER BY symptom ASC
+	</select>
+	
+	<select id="selectMedicines" resultType="MedicineVO">
+		SELECT ruleID, medicine, defaultValue
+		FROM prescription
+		WHERE ruleID = #{ruleID} ORDER BY medicine ASC
+	</select>
+	
+	
+	<!-- 각 처방군을 db에서 불러오기 위한 resultMap -->
+	<resultMap id="prescriptionResult" type="PrescriptionGroupVO">
+		<result property="prescrGroup" column="prescrGroup"/>
+		<collection property="prescrList" column="prescrGroup" javaType="java.util.ArrayList" ofType="PrescriptionVO" select="selectMedicine"/>
+	</resultMap>
+	
+	<select id="selectPrescription" resultMap="prescriptionResult">
+		SELECT DISTINCT prescrGroup FROM prescriptionGroup
+	</select>
+	
+	<select id="selectMedicine" resultType="PrescriptionVO">
+		SELECT prescrGroup, medicine, defaultValue
+		FROM prescriptionGroup
+		WHERE prescrGroup = #{prescrGroup} ORDER BY medicine ASC
+	</select>
+	
+	
+	<!-- 해당 환자 증상들 불러옴 -->
+	<resultMap id="PatientResult" type="PatientVO">
+		<result property="pNumber" column="pNumber"/>
+		<result property="pName" column="pName"/>
+		<result property="age" column="age"/>
+		<collection property="symptomArr" column="pNumber" javaType="java.util.ArrayList" ofType="PatientSymptomVO" select="selectPatientSymptoms"/>
+	</resultMap>
+	
+	<select id="getPatientSymptoms" parameterType="String" resultMap="PatientResult">
+		SELECT pNumber, pName, age FROM patient WHERE pNumber = #{pNumber}
+	</select>
+	
+	<select id="selectPatientSymptoms" resultType="PatientSymptomVO">
+		SELECT pNum, symptom, degree FROM updateSymptom 
+		WHERE pNum = #{pNum} 	
+	</select>
+	
+	
+	<!-- 진료가 끝나고 저장버튼 눌렀을때 진단 기록 저장 -->
+	<insert id="savePatientDiagnosis" parameterType="PatientDiagnosisVO">
+		INSERT INTO EvaluatedRule(patientNum, patientName, DATE, SCORE, COMMENT) 
+		VALUES(#{pNumber}, #{pName}, #{visitDate}, #{score}, #{comment})
+	</insert>
+	
+	<!--문진 과정에서 증상 삭제  -->
+	<delete id="deleteSymptom" parameterType="PatientSymptomVO">
+		DELETE FROM updateSymptom 
+		WHERE symptom = #{symptom} AND pNum = #{pNum} AND date = #{visitDate} 
+	</delete>
+	
+	<!-- 문진 과정에서 증상 추가 -->
+	<insert id="addSymptom" parameterType="PatientSymptomVO">
+		INSERT INTO updateSymptom(date, pNum, symptom, degree) 
+		VALUES(#{visitDate},#{pNum}, #{symptom}, #{degree})
+	</insert>
+	
+	
+	<!-- 증상 이름으로 증상 검색 -->
+	<resultMap id="symptomResult" type="SymptomVO">
+       <result property="symptom" column="sName"/>
+       <result property="sRegion" column="sRegion"/>
+       <result property="min" column="min"/>
+       <result property="max" column="max"/>
+    </resultMap>
+
+	<select id="getSearchSymptom" parameterType="SymptomVO" resultMap="symptomResult">
+		SELECT sName, sRegion, min, max FROM symptom WHERE 1=1
+			<if test="symptom != null">
+				AND sName LIKE CONCAT('%',#{symptom},'%')
+			</if>
+	</select>
+</mapper>

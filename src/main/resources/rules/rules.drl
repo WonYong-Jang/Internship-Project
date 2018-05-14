@@ -1,0 +1,399 @@
+package rules
+
+import com.drools.po.RuleMap
+import com.drools.po.PrescrGroupMap
+import com.company.dto.DomainRuleVO
+import com.company.dto.SymptomVO
+import com.company.dto.PatientVO
+import com.company.dto.PrescriptionGroupVO
+import com.company.dto.PrescriptionVO
+import com.company.dto.PatientDiagnosisVO
+
+/*
+rule "처방군검사" salience -1
+	lock-on-active true
+	when
+		ps: PatientVO()
+		pg: PrescrGroupMap( checkPrescrGroupTest(ps,pg) )
+		
+		//eval(checkPrescrGroup(ps,pg))
+	then
+		//System.out.println("success5");
+end
+*/
+rule "두통/단순"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("두통"), checkSymptom(ps , ds))
+	then
+		modify(ps){
+			diagnosis.addDiagnosisArr(ds.ruleID),
+			diagnosis.setSimplePrescr(ds.getMedicines())
+			};		
+end
+
+rule "어지러움/단순"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("어지러움"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setSimplePrescr(ds.getMedicines());		
+end
+
+rule "구취/단순"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("구취"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setSimplePrescr(ds.getMedicines());		
+end
+
+rule "소화불량/단순"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("소화불량"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setSimplePrescr(ds.getMedicines());		
+end
+
+rule "청쾌답답/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("청쾌답답"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+end
+
+rule "소화답답/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("소화답답"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "음적통증/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("음적통증"), checkSymptom(ps , ds))
+	then
+		
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "음적답답/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("음적답답"), checkSymptom(ps , ds))
+	then
+		
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "체기통증/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("체기통증"), checkSymptom(ps , ds))
+	then
+		
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "소화무력/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("소화무력"), checkSymptom(ps , ds))
+	then
+		
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "가스답답/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스답답"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "가스답답2/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스답답2"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "아티답답/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("아티답답"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "가스통증/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스통증"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "변비통증/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("변비통증"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "헤파간문/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("헤파간문"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "설사가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("설사가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "설사가스2/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("설사가스2"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "청쾌가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("청쾌가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "가스가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "가스가스2/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스가스2"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "유산균가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("유산균가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "변비가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("변비가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "장쾌가스/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("장쾌가스"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "장쾌변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("장쾌변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+			
+end
+
+rule "변비장무력/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("변비장무력"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "설사설사/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("설사설사"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "가스설사/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스설사"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());
+end
+
+rule "설사변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("설사변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "변비변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("변비변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "가스변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("가스변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "장쾌변비2/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("장쾌변비2"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "음적변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("음적변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "도인승기변비/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("도인승기변비"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+
+rule "설사복통/복합"
+	lock-on-active true
+	when
+		ps: PatientVO()
+		ruleMap:RuleMap(ds : getRuleMatch("설사복통"), checkSymptom(ps , ds))
+	then
+		ps.diagnosis.addDiagnosisArr(ds.ruleID);
+		ps.diagnosis.setComplexPrescr(ds.getMedicines());	
+end
+	
